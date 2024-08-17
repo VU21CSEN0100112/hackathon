@@ -1,0 +1,131 @@
+import os
+from collections import Counter
+
+class HealthRecordSystem:
+    def __init__(self):
+        self.records = {}
+
+    def add_record(self, patient_name, diagnosis):
+        if patient_name in self.records:
+            self.records[patient_name].append(diagnosis)
+        else:
+            self.records[patient_name] = [diagnosis]
+        print(f"Record added for {patient_name}.")
+
+    def display_records(self, patient_name):
+        if patient_name in self.records:
+            print(f"\nRecords for {patient_name}:")
+            for idx, diagnosis in enumerate(self.records[patient_name], 1):
+                print(f"{idx}. {diagnosis}")
+        else:
+            print(f"\nNo records found for {patient_name}.")
+
+    def delete_record(self, patient_name, record_index):
+        if patient_name in self.records:
+            try:
+                removed_record = self.records[patient_name].pop(record_index - 1)
+                print(f"Deleted record: {removed_record}")
+            except IndexError:
+                print("Invalid record index.")
+        else:
+            print(f"No records found for {patient_name}.")
+
+    def delete_all_records(self, patient_name):
+        if patient_name in self.records:
+            del self.records[patient_name]
+            print(f"All records deleted for {patient_name}.")
+        else:
+            print(f"No records found for {patient_name}.")
+
+    def update_record(self, patient_name, record_index, updated_record):
+        if patient_name in self.records:
+            try:
+                self.records[patient_name][record_index - 1] = updated_record
+                print(f"Record {record_index} updated for {patient_name}.")
+            except IndexError:
+                print("Invalid record index.")
+        else:
+            print(f"No records found for {patient_name}.")
+
+    def search_records(self, patient_name, search_term):
+        if patient_name in self.records:
+            matching_records = [record for record in self.records[patient_name] if search_term.lower() in record.lower()]
+            if matching_records:
+                print(f"\nRecords containing '{search_term}' for {patient_name}:")
+                for idx, record in enumerate(matching_records, 1):
+                    print(f"{idx}. {record}")
+            else:
+                print(f"\nNo records found containing '{search_term}' for {patient_name}.")
+        else:
+            print(f"No records found for {patient_name}.")
+
+    def generate_summary(self):
+        total_records = sum(len(records) for records in self.records.values())
+        all_records = [record for records in self.records.values() for record in records]
+        most_common_record = Counter(all_records).most_common(1)
+
+        print(f"\nSystem Summary:")
+        print(f"Total number of records: {total_records}")
+        if most_common_record:
+            print(f"Most common record: {most_common_record[0][0]} (appeared {most_common_record[0][1]} times)")
+
+    def save_records_to_file(self, patient_name):
+        if patient_name in self.records:
+            file_name = f"{patient_name}_records.txt"
+            with open(file_name, 'w') as file:
+                for idx, record in enumerate(self.records[patient_name], 1):
+                    file.write(f"{idx}. {record}\n")
+            print(f"Records for {patient_name} saved to {file_name}.")
+        else:
+            print(f"No records found for {patient_name}.")
+
+# Main program loop
+if __name__ == "__main__":
+    system = HealthRecordSystem()
+
+    while True:
+        print("\nMain Menu:")
+        print("1. Add Record")
+        print("2. Display Records")
+        print("3. Delete Record")
+        print("4. Delete All Records")
+        print("5. Update Record")
+        print("6. Search Records")
+        print("7. Generate Summary")
+        print("8. Save Records to File")
+        print("9. Exit")
+        choice = input("Enter your choice (1-9): ")
+
+        if choice == '1':
+            patient_name = input("Enter patient name: ")
+            diagnosis = input("Enter record details: ")
+            system.add_record(patient_name, diagnosis)
+        elif choice == '2':
+            patient_name = input("Enter patient name: ")
+            system.display_records(patient_name)
+        elif choice == '3':
+            patient_name = input("Enter patient name: ")
+            record_index = int(input("Enter record index to delete: "))
+            system.delete_record(patient_name, record_index)
+        elif choice == '4':
+            patient_name = input("Enter patient name: ")
+            system.delete_all_records(patient_name)
+        elif choice == '5':
+            patient_name = input("Enter patient name: ")
+            record_index = int(input("Enter record index to update: "))
+            updated_record = input("Enter updated record details: ")
+            system.update_record(patient_name, record_index, updated_record)
+        elif choice == '6':
+            patient_name = input("Enter patient name: ")
+            search_term = input("Enter search term: ")
+            system.search_records(patient_name, search_term)
+        elif choice == '7':
+            system.generate_summary()
+        elif choice == '8':
+            patient_name = input("Enter patient name: ")
+            system.save_records_to_file(patient_name)
+        elif choice == '9':
+            print("Exiting the system. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please select a valid option.")
